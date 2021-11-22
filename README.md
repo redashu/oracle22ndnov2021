@@ -1,1 +1,4 @@
-# oracle22ndnov2021
+# Training Plan 
+
+<img src="plan.png">
+
