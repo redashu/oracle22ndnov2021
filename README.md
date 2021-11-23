@@ -191,4 +191,176 @@ ashupython               v1        df5d1b3b0693   13 seconds ago   399MB
 
 ```
 
+### checking image build history 
+
+```
+ docker  history  ashupython:v1
+IMAGE          CREATED          CREATED BY                                      SIZE      COMMENT
+df5d1b3b0693   25 minutes ago   /bin/sh -c #(nop)  CMD ["python3" "/code/ora…   0B        
+0411cb821531   25 minutes ago   /bin/sh -c #(nop) COPY file:6e29d47c004b1169…   231B      
+9a604bdcff0c   25 minutes ago   /bin/sh -c mkdir  /code                         0B        
+bca0e621c54c   25 minutes ago   /bin/sh -c yum install python3 -y               164MB     
+3cfe437b046a   26 minutes ago   /bin/sh -c #(nop)  LABEL email=ashutoshh@lin…   0B        
+d3b9be373c72   26 minutes ago   /bin/sh -c #(nop)  LABEL name=ashutoshh         0B        
+fa4253e97227   4 days ago       /bin/sh -c #(nop)  CMD ["/bin/bash"]            0B        
+<missing>      4 days ago       /bin/sh -c #(nop) ADD file:4e55964bdaba265f1…   235MB 
+
+```
+
+### creating container from default image 
+
+```
+docker  run -it -d --name ashuc1  ashupython:v1 
+ff7066ae07df69b2b9d24e80a1e842ec7dc86941208d667471b9117570ffc641
+[ashu@ip-172-31-80-220 pythonapp]$ docker  ps
+CONTAINER ID   IMAGE           COMMAND                  CREATED             STATUS             PORTS     NAMES
+ff7066ae07df   ashupython:v1   "python3 /code/oracl…"   11 seconds ago      Up 10 seconds                ashuc1
+
+```
+
+### checking output of container app 
+
+```
+docker logs -f  ashuc1
+
+```
+
+### accessing contianer 
+
+```
+
+docker  exec -it  ashuc1  bash 
+[root@ff7066ae07df /]# cd /code/
+[root@ff7066ae07df code]# ls
+oracle.py
+[root@ff7066ae07df code]# cat  /etc/os-release 
+NAME="Oracle Linux Server"
+VERSION="8.5"
+ID="ol"
+ID_LIKE="fedora"
+VARIANT="Server"
+VARIANT_ID="server"
+VERSION_ID="8.5"
+PLATFORM_ID="platform:el8"
+PRETTY_NAME="Oracle Linux Server 8.5"
+ANSI_COLOR="0;31"
+CPE_NAME="cpe:/o:oracle:linux:8:5:server"
+HOME_URL="https://linux.oracle.com/"
+BUG_REPORT_URL="https://bugzilla.oracle.com/"
+
+ORACLE_BUGZILLA_PRODUCT="Oracle Linux 8"
+ORACLE_BUGZILLA_PRODUCT_VERSION=8.5
+ORACLE_SUPPORT_PRODUCT="Oracle Linux"
+ORACLE_SUPPORT_PRODUCT_VERSION=8.5
+[root@ff7066ae07df code]# exit
+exit
+
+```
+
+### removing container 
+
+```
+$ docker stop  ashuc1 
+ashuc1
+[ashu@ip-172-31-80-220 pythonapp]$ docker  rm  ashuc1
+ashuc1
+
+```
+
+### changing in app need rebuild 
+
+```
+ ls
+oracle.dockerfile  oracle.py
+[ashu@ip-172-31-80-220 pythonapp]$ docker build -t  ashupython:v2  -f  oracle.dockerfile  .  
+Sending build context to Docker daemon  3.072kB
+Step 1/7 : FROM oraclelinux:8.5
+ ---> fa4253e97227
+Step 2/7 : LABEL name=ashutoshh
+ ---> Using cache
+ ---> d3b9be373c72
+Step 3/7 : LABEL email=ashutoshh@linux.com
+ ---> Using cache
+ 
+ ```
+ 
+ ### Docker build is using cache 
+ 
+ ```
+  142  docker build -t  ashupython:v2  -f  oracle.dockerfile  .  
+  143  history 
+  144  docker build -t  ashupython:v2  -f  oracle.dockerfile --no-cache    .  
+  
+  ```
+  
+  ### COntainer data copy and its isolation using Namespace 
+  
+  <img src="iso.png">
+  
+  ### Solution to container data copy assignment 
+  
+  ```
+   150  docker  run -itd --name ashuc1  alpine 
+  151  docker  run -itd --name ashuc2  alpine 
+  152  docker ps
+  153  history 
+[ashu@ip-172-31-80-220 pythonapp]$ docker  exec -it ashuc1  sh 
+/ # 
+/ # 
+/ # pwd
+/
+/ # ls
+bin    dev    etc    home   lib    media  mnt    opt    proc   root   run    sbin   srv    sys    tmp    usr    var
+/ # echo  hello world  >helloc1.txt 
+/ # ls
+bin          etc          home         media        opt          root         sbin         sys          usr
+dev          helloc1.txt  lib          mnt          proc         run          srv          tmp          var
+/ # cat  helloc1.txt 
+hello world
+/ # exit
+[ashu@ip-172-31-80-220 pythonapp]$ docker  cp  ashuc1:/helloc1.txt  . 
+[ashu@ip-172-31-80-220 pythonapp]$ ls
+helloc1.txt  oracle.dockerfile  oracle.py
+[ashu@ip-172-31-80-220 pythonapp]$ docker  cp  helloc1.txt  ashuc2:/
+[ashu@ip-172-31-80-220 pythonapp]$ docker exec -it ashuc2 sh 
+/ # ls
+bin          etc          home         media        opt          root         sbin         sys          usr
+dev          helloc1.txt  lib          mnt          proc         run          srv          tmp          var
+/ # exit
+
+```
+
+### Java code based Dockerfile 
+
+```
+FROM openjdk 
+LABEL email=ashutoshh@linux.com 
+RUN mkdir /mycode 
+ADD oracle.java /mycode/oracle.java 
+# COPY and ADD both are doing same job except one change
+# ADD can also take data from URL while copy can't 
+WORKDIR /mycode
+# to change directory during image build time 
+RUN javac  oracle.java 
+# compiling java code 
+CMD ["java","myclass"]
+# default process 
+
+```
+
+### Building image 
+
+```
+cd  javaapp/
+[ashu@ip-172-31-80-220 javaapp]$ ls
+Dockerfile  oracle.java
+[ashu@ip-172-31-80-220 javaapp]$ docker build -t ashujava:v1  . 
+Sending build context to Docker daemon  3.072kB
+Step 1/7 : FROM openjdk
+ ---> 1b3756d6df61
+Step 2/7 : LABEL email=ashutoshh@linux.com
+ ---> Running in f27a4bd83544
+Removing intermediate container f27a4bd83544
+ ---> 967cc1424c25
+```
 
