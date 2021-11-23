@@ -364,3 +364,83 @@ Removing intermediate container f27a4bd83544
  ---> 967cc1424c25
 ```
 
+### creating java container 
+
+```
+ docker run -itd --name  ashujc1  ashujava:v1
+ 
+docker  exec -it  ashujc1  bash 
+bash-4.4# 
+bash-4.4# java -version 
+openjdk version "17.0.1" 2021-10-19
+OpenJDK Runtime Environment (build 17.0.1+12-39)
+OpenJDK 64-Bit Server VM (build 17.0.1+12-39, mixed mode, sharing)
+bash-4.4# jps
+1 myclass
+50 Jps
+bash-4.4# exit
+exit
+
+```
+
+### dockerfile with custom jdk version 
+
+### dockerfile 
+
+```
+FROM oraclelinux:8.5 
+LABEL email=ashutoshh@linux.com 
+RUN dnf install java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64 -y 
+RUN mkdir /mycode 
+ADD oracle.java /mycode/oracle.java 
+# COPY and ADD both are doing same job except one change
+# ADD can also take data from URL while copy can't 
+WORKDIR /mycode
+# to change directory during image build time 
+RUN javac  oracle.java 
+# compiling java code 
+CMD ["java","myclass"]
+# default process 
+
+```
+
+### building 
+
+```
+ cd  javaapp/
+[ashu@ip-172-31-80-220 javaapp]$ ls
+Dockerfile  jdk8.dockerfile  oracle.java
+[ashu@ip-172-31-80-220 javaapp]$ docker  build  -t  ashujava:jdk8  -f  jdk8.dockerfile  . 
+Sending build context to Docker daemon  4.096kB
+Step 1/8 : FROM oraclelinux:8.5
+ ---> fa4253e97227
+Step 2/8 : LABEL email=ashutoshh@linux.com
+ ---> Running in 16c611590ced
+Removing intermediate container 16c611590ced
+ ---> 1747921ec3ac
+Step 3/8 : RUN dnf install java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64 -y
+ ---> Running in 80aa590f7f79
+ 
+ ```
+ 
+ ### creating container and checking it 
+ 
+ ```
+  docker  run -itd --name  ashujcc2   ashujava:jdk8 
+ docker  exec -it ashujcc2   bash 
+[root@2dc9c5a7788a mycode]# 
+[root@2dc9c5a7788a mycode]# jps
+1 myclass
+34 Jps
+[root@2dc9c5a7788a mycode]# java -version 
+openjdk version "1.8.0_312"
+OpenJDK Runtime Environment (build 1.8.0_312-b07)
+OpenJDK 64-Bit Server VM (build 25.312-b07, mixed mode)
+[root@2dc9c5a7788a mycode]# exit
+exit
+
+```
+
+
+
+
