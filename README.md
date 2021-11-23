@@ -440,6 +440,61 @@ OpenJDK 64-Bit Server VM (build 25.312-b07, mixed mode)
 exit
 
 ```
+### Docker hub the public image registry 
+
+<img src="hub.png">
+
+### pushing image to docker hub 
+
+```
+docker  images  |  grep -i ashu
+ashujava                 v1        1244c5d2aa5f   8 minutes ago       471MB
+ashujava                 jdk8      e3545ddc067d   About an hour ago   601MB
+ashupython               v2        ddcb5220dcd1   3 hours ago         399MB
+ashupython               v1        df5d1b3b0693   3 hours ago         399MB
+[ashu@ip-172-31-80-220 appimages]$ 
+[ashu@ip-172-31-80-220 appimages]$ docker  tag  df5d1b3b0693    dockerashu/oracleapps:v1 
+[ashu@ip-172-31-80-220 appimages]$ docker  images  |  grep -i ashu
+ashujava                 v1        1244c5d2aa5f   8 minutes ago       471MB
+ashujava                 jdk8      e3545ddc067d   About an hour ago   601MB
+ashupython               v2        ddcb5220dcd1   3 hours ago         399MB
+dockerashu/oracleapps    v1        df5d1b3b0693   3 hours ago         399MB
+ashupython               v1        df5d1b3b0693   3 hours ago         399MB
+[ashu@ip-172-31-80-220 appimages]$ 
+[ashu@ip-172-31-80-220 appimages]$ docker login 
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: dockerashu
+Password: 
+WARNING! Your password will be stored unencrypted in /home/ashu/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+[ashu@ip-172-31-80-220 appimages]$ docker  push  dockerashu/oracleapps:v1
+The push refers to repository [docker.io/dockerashu/oracleapps]
+dc1c2075bf15: Pushed 
+ddf2bf4e41db: Pushing  2.048kB
+fc08c08f0eb6: Pushing  551.4kB/164MB
+c029303805d7: Mounted from library/oraclelinux 
+
+```
+
+### some info about Docker hub 
+
+<img src="dhub.png">
+
+### pulling image from different docker engine 
+
+```
+docker pull  dockerashu/oracleapps:v1 
+v1: Pulling from dockerashu/oracleapps
+b791d4160c6a: Downloading  6.966MB/87.47MB
+46cff73f858e: Downloading  6.444MB/115.4MB
+f1f3e6d3af9c: Download complete 
+dab3a8909c9f: Download complete 
+
+```
+
 
 
 
