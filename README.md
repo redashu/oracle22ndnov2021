@@ -495,6 +495,365 @@ dab3a8909c9f: Download complete
 
 ```
 
+## Docker NEtworking 
+
+### checking number of network 
+
+```
+$ docker  network  ls
+NETWORK ID     NAME      DRIVER    SCOPE
+eeac5c659648   bridge    bridge    local
+f935aeaccb11   host      host      local
+d825610a8d02   none      null      local
+
+```
+
+### exploring bridge network 
+
+```
+docker  network  ls
+NETWORK ID     NAME      DRIVER    SCOPE
+eeac5c659648   bridge    bridge    local
+f935aeaccb11   host      host      local
+d825610a8d02   none      null      local
+[ashu@ip-172-31-80-220 appimages]$ 
+[ashu@ip-172-31-80-220 appimages]$ docker  network  inspect  eeac5c659648
+[
+    {
+        "Name": "bridge",
+        "Id": "eeac5c6596484669882afa1ccdac0100261199e0d76d2331e2ed3c3369a38eb1",
+        "Created": "2021-11-23T03:49:16.178211973Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "1500"
+        },
+        "Labels": {}
+    }
+]
+
+```
+
+### Docker network overview 
+
+<img src="dnet.png">
+### creating container and checking IP address 
+
+```
+ docker  exec -it ashuc1  sh 
+/ # 
+/ # ping  172.17.0.3
+PING 172.17.0.3 (172.17.0.3): 56 data bytes
+64 bytes from 172.17.0.3: seq=0 ttl=64 time=0.217 ms
+64 bytes from 172.17.0.3: seq=1 ttl=64 time=0.082 ms
+^C
+--- 172.17.0.3 ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 0.082/0.149/0.217 ms
+/ # ping  172.17.0.9
+PING 172.17.0.9 (172.17.0.9): 56 data bytes
+64 bytes from 172.17.0.9: seq=0 ttl=64 time=0.126 ms
+64 bytes from 172.17.0.9: seq=1 ttl=64 time=0.079 ms
+^C
+--- 172.17.0.9 ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 0.079/0.102/0.126 ms
+/ # exit
+
+```
+
+### checking container listed in the bridge 
+
+```
+ docker  network inspect  eeac5c659648
+[
+    {
+        "Name": "bridge",
+        "Id": "eeac5c6596484669882afa1ccdac0100261199e0d76d2331e2ed3c3369a38eb1",
+        "Created": "2021-11-23T03:49:16.178211973Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "08d2262f103dfecaeff8403cb0a7ee52b4590548a330e05ad2561e7620789c45": {
+                "Name": "madhurijavac1",
+                "EndpointID": "51eaa6f637633472133d9104fdf6c0c8014f8b005e9f7b2d2f216a9077f3695a",
+                "MacAddress": "02:42:ac:11:00:0b",
+                "IPv4Address": "172.17.0.11/16",
+                "IPv6Address": ""
+            },
+            "0fc13e57b0160ae05c53c22f07710ca66e1cefefdfbde3c64f803141e6aa3fa3": {
+                "Name": "assin1",
+                "EndpointID": "71c63aee4115cfb8c578db34df6cc6d982491619fe79f0a50095f702c2b16a4f",
+                "MacAddress": "02:42:ac:11:00:06",
+                "IPv4Address": "172.17.0.6/16",
+                "IPv6Address": ""
+            },
+            "23c5809320f2a881471b24cc4a8d8baab1129170fb9eacf37a99ac9f82f6efe6": {
+                "Name": "krishna1",
+                "EndpointID": "b660373a26d6160521f1e147e6c2d27258337cddddb514b8e3d47903819736b2",
+                "MacAddress": "02:42:ac:11:00:0d",
+                "IPv4Address": "172.17.0.13/16",
+                "IPv6Address": ""
+                
+                
+  ```
+  
+  ### Due to NAT containers can access outside Host also 
+  
+  <img src="nat.png">
+  
+  ###
+  
+  ```
+  docker  exec -it ashuc1  sh 
+/ # 
+/ # 
+/ # ping google.com 
+PING google.com (172.217.15.78): 56 data bytes
+64 bytes from 172.217.15.78: seq=0 ttl=109 time=15.018 ms
+64 bytes from 172.217.15.78: seq=1 ttl=109 time=15.004 ms
+64 bytes from 172.217.15.78: seq=2 ttl=109 time=14.995 ms
+64 bytes from 172.217.15.78: seq=3 ttl=109 time=15.019 ms
+64 bytes from 172.217.15.78: seq=4 ttl=109 time=15.031 ms
+^C
+--- google.com ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max = 14.995/15.013/15.031 ms
+/ # exit
+
+```
+
+### Port Forwarding 
+
+<img src="portf.png">
+
+
+### Demo webapp 
+
+<img src="nginx.png">
+
+### Cloning sample website 
+
+```
+git clone  https://github.com/website-template/html5-simple-personal-website
+Cloning into 'html5-simple-personal-website'...
+remote: Enumerating objects: 58, done.
+remote: Counting objects: 100% (9/9), done.
+remote: Compressing objects: 100% (9/9), done.
+remote: Total 58 (delta 2), reused 3 (delta 0), pack-reused 49
+Receiving objects: 100% (58/58), 842.99 KiB | 18.73 MiB/s, done.
+Resolving deltas: 100% (9/9), done.
+[ashu@ip-172-31-80-220 appimages]$ ls
+html5-simple-personal-website  javaapp  pythonapp
+
+```
+
+### building image 
+
+```
+ ls
+assets  CNAME  Dockerfile  index.html  LICENSE  README.md
+[ashu@ip-172-31-80-220 html5-simple-personal-website]$ docker build -t ashuweb:v1 . 
+Sending build context to Docker daemon  1.346MB
+Step 1/3 : FROM nginx
+latest: Pulling from library/nginx
+eff15d958d66: Downloading  25.76MB/31.37MB
+1e5351450a59: Downloading   15.4MB/25.35MB
+2df63e6ce2be: Download complete 
+
+```
+
+### checking images
+
+```
+
+[ashu@ip-172-31-80-220 html5-simple-personal-website]$ docker images  |   grep -i ashu
+ashuweb                       v1          fbc917b671ea   21 seconds ago   143MB
+ashujava                      v1          1244c5d2aa5f   2 hours ago      471MB
+ashujava                      jdk8        e3545ddc067d   3 hours ago      601MB
+ashupython                    v2          ddcb5220dcd1   4 hours ago      399MB
+ashupython                    v1          df5d1b3b0693   5 hours a
+
+```
+
+### creating containers 
+
+```
+docker run -itd --name ashuapp1 -p 2244:80 ashuweb:v1  
+adbcbd7a45f71eed5a290a0b5a546b6ac16c4839bbcbd60848863f78be12b531
+
+```
+
+### Java app 
+
+```
+docker  build  -t  ashutomcat:v1 https://github.com/redashu/javawebapp.git Sending build context to Docker daemon  154.6kB
+Step 1/6 : FROM tomcat
+latest: Pulling from library/tomcat
+647acf3d48c2: Pull complete 
+b02967ef0034: Pull complete 
+e1ad2231829e: Pull complete 
+5576ce26bf1d: Pull complete 
+26518d6c686a: Pull complete 
+cdb1f4e0dbfd: Pull complete 
+
+```
+
+### multi webapp in a single docker image 
+
+<img src="mapp.png">
+
+### Dockerfile 
+
+```
+FROM oraclelinux:8.5
+LABEL email=ashutoshh@linux.com
+ENV deploy=hello 
+# to define some env variable in docker image with some default value 
+RUN yum install httpd -y 
+RUN mkdir  /common  /common/app1  /common/app2 /common/app3 
+COPY webapp1  /common/app1/
+COPY webapp2  /common/app2/
+COPY webapp3  /common/app3/
+COPY deploy.sh /common/
+WORKDIR /common/
+RUN chmod +x deploy.sh 
+EXPOSE 80 
+ENTRYPOINT  ["./deploy.sh"]
+# ENTRYPOINT is replacement of CMD  -- httpd -dforeground is gonna start httpd 
+
+
+```
+
+### shell script 
+
+```
+#!/bin/bash 
+
+if  [  "deploy" == "app1"   ]
+then
+    cp -rf /common/app1/ /var/www/html/
+     httpd -DFOREGROUND
+
+elif   [  "deploy" == "app2"   ]
+then
+    cp -rf /common/app2/ /var/www/html/
+     httpd -DFOREGROUND
+
+elif   [  "deploy" == "app3"   ]
+then
+    cp -rf /common/app3/ /var/www/html/
+     httpd -DFOREGROUND
+
+else 
+    echo "wrong variable name "  >/var/www/html/index.html
+    httpd -DFOREGROUND 
+fi
+
+
+```
+
+### image building 
+
+```
+ ls
+deploy.sh  Dockerfile  javaapp  pythonapp  webapp1  webapp2  webapp3
+[ashu@ip-172-31-80-220 appimages]$ docker  build -t  dockerashu/ashuhttpd:v9999 .
+Sending build context to Docker daemon  5.862MB
+Step 1/13 : FROM oraclelinux:8.5
+ ---> fa4253e97227
+Step 2/13 : LABEL email=ashutoshh@linux.com
+ ---> Using cache
+ ---> 36130db1e94f
+Step 3/13 : ENV deploy=hello
+ ---> Using cache
+ ---> e1bdd9995f1e
+Step 4/13 : RUN yum install httpd -y
+ ---> Using cache
+ ---> 55b9d028bfaa
+Step 5/13 : RUN mkdir  /common  /common/app1  /common/app2 /common/app3
+ ---> Using cache
+ ---> bfcd4bb945d7
+Step 6/13 : COPY webapp1  /common/app1/
+ ---> 924302fe3c92
+Step 7/13 : COPY webapp2  /common/app2/
+ ---> f9e194893daa
+Step 8/13 : COPY webapp3  /common/app3/
+ ---> 3d61972b3ef0
+Step 9/13 : COPY deploy.sh /common/
+ ---> 117adcefc8ff
+Step 10/13 : WORKDIR /common/
+ ---> Running in ffac63f49259
+Removing intermediate container ffac63f49259
+ ---> 23c2aa3af0d8
+Step 11/13 : RUN chmod +x deploy.sh
+ ---> Running in caa24a3e4d42
+Removing intermediate container caa24a3e4d42
+ ---> b4c6b4bd1279
+Step 12/13 : EXPOSE 80
+ ---> Running in 5453227badbe
+Removing intermediate container 5453227badbe
+ ---> 003c6875b07b
+Step 13/13 : ENTRYPOINT  ["./deploy.sh"]
+ ---> Running in fbef71845fa6
+Removing intermediate container fbef71845fa6
+ ---> 9b0bb54a1dde
+Successfully built 9b0bb54a1dde
+Successfully tagged dockerashu/ashuhttpd:v9999
+
+```
+
+### creating containers 
+
+```
+ docker  run -itd --name ashuappx4 -e  deploy=app1 -p 8841:80 dockerashu/ashuhttpd:v9991 
+
+```
+
+
+
 
 
 
