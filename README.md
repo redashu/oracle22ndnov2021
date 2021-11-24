@@ -280,6 +280,18 @@ Stopping ashuc123  ...
 
 ```
 
+### Docker client options 
+
+<img src="cli.png">
+
+### portainer in docker engine 
+
+```
+ docker  run -tid --name webui -p 9000:9000 -v  /var/run/docker.sock:/var/run/docker.sock    portainer/portainer
+ 
+```
+
+
 
 
 
