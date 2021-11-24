@@ -45,5 +45,88 @@ round-trip min/avg/max = 0.082/0.083/0.085 ms
   
 ```
 
+### container to image 
+
+```
+363  docker run -it  --name ashuc11  centos bash 
+  364  history 
+[ashu@ip-172-31-80-220 appimages]$ docker  commit ashuc11  ashucimg:v007  
+sha256:7bd19e44dd4f92dae7dbf31bde1f1db78f618cd3a88bf5504ef8e067c9ff544c
+[ashu@ip-172-31-80-220 appimages]$ 
+[ashu@ip-172-31-80-220 appimages]$ docker  tag  ashucimg:v007  dockerashu/orday3:v3 
+[ashu@ip-172-31-80-220 appimages]$ 
+[ashu@ip-172-31-80-220 appimages]$ docker login -u dockerashu
+Password: 
+WARNING! Your password will be stored unencrypted in /home/ashu/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+[ashu@ip-172-31-80-220 appimages]$ docker push  dockerashu/orday3:v3
+The push refers to repository [docker.io/dockerashu/orday3]
+338f4be3981d: Pushed 
+74ddd0ec08fa: Mounted from varunssai/varundockerapps 
+v3: digest: sha256:748b7e49b4e46aae552b576b1d375ea5bd2b9c7306316e93f1d2afea8be2fced size: 741
+
+```
+
+### Storage in Container 
+
+<img src="st.png">
+
+### creating volume in docker engine 
+
+```
+docker  volume  create  ashuvol1 
+ashuvol1
+[ashu@ip-172-31-80-220 appimages]$ docker  volume  ls
+DRIVER    VOLUME NAME
+local     ashuvol1
+local     shared
+[ashu@ip-172-31-80-220 appimages]$ docker  volume  inspect  ashuvol1 
+[
+    {
+        "CreatedAt": "2021-11-24T05:11:37Z",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/ashuvol1/_data",
+        "Name": "ashuvol1",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+
+```
+
+### access storage in back ground 
+
+<img src="st1.png">
+
+### mounting external location from docker host to container 
+
+```
+docker  run -itd  --name ashupyc1  -v  /home/ashu/appimages/pythonapp/:/code111/    ashupython:v1   python3  /code111/oracle.py 
+
+```
+
+### mounting host data 
+
+```
+docker run -it --rm   -v  /etc:/myetc:ro  alpine sh 
+/ # 
+/ # 
+/ # cd  /myetc/
+/myetc # ls
+DIR_COLORS               exports                  man_db.conf              rsyncd.conf
+DIR_COLORS.256color      exports.d                mke2fs.conf              rsyslog.conf
+DIR_COLORS.lightbgcolor  filesystems              modprobe.d               rsyslog.d
+GREP_COLORS              fstab                    modules-load.d           rwtab
+GeoIP.conf               gcrypt                   motd                     rwtab.d
+GeoIP.conf.default       gnupg                    mtab                     sasl2
+NetworkManager           groff                    m
+
+```
+
+
 
 
