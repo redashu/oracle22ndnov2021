@@ -291,6 +291,84 @@ Stopping ashuc123  ...
  
 ```
 
+### Problem with Docker engine / any CRE 
+
+<img src="cre.png">
+
+### container architecture 
+
+<img src="carc.png">
+
+### k8s arch 
+
+<img src="k8s1.png">
+
+### connecting to k8s from admin/devops/developer 
+
+<img src="cli11.png">
+
+### connecting to k8s cluster 
+
+## MEthods 
+
+1. CLi 
+2. WebUI 
+
+### kubectl installing in macOS 
+
+### use docs link 
+
+[kubectl_install](https://kubernetes.io/docs/tasks/tools/install-kubectl-macos/)
+
+```
+7004  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/amd64/kubectl"\n   
+ 7005  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/amd64/kubectl.sha256"\n   
+ 7006  chmod +x ./kubectl
+ 7007  sudo mv ./kubectl /usr/local/bin/kubectl
+ 7008  sudo chown root: /usr/local/bin/kubectl
+ 7009  kubectl version --client
+
+```
+
+## to connect k8s master we need auth / token details from client side 
+
+### auth file in master Node 
+
+```
+cd  /etc/kubernetes/
+[root@control-plane kubernetes]# ls
+admin.conf  
+
+```
+
+### checking auth connection 
+
+```
+kubectl  version  --kubeconfig  admin.conf.txt 
+Client Version: version.Info{Major:"1", Minor:"22", GitVersion:"v1.22.4", GitCommit:"b695d79d4f967c403a96986f1750a35eb75e75f1", GitTreeState:"clean", BuildDate:"2021-11-17T15:48:33Z", GoVersion:"go1.16.10", Compiler:"gc", Platform:"darwin/amd64"}
+Server Version: version.Info{Major:"1", Minor:"22", GitVersion:"v1.22.4", GitCommit:"b695d79d4f967c403a96986f1750a35eb75e75f1", GitTreeState:"clean", BuildDate:"2021-11-17T15:42:41Z", GoVersion:"go1.16.10", Compiler:"gc", Platform:"linux/amd64"}
+ fire@ashutoshhs-MacBook-Air  ~/Desktop  
+ fire@ashutoshhs-MacBook-Air  ~/Desktop  kubectl  get  nodes   --kubeconfig  admin.conf.txt 
+NAME            STATUS   ROLES                  AGE     VERSION
+control-plane   Ready    control-plane,master   6h28m   v1.22.4
+node1           Ready    <none>                 6h27m   v1.22.4
+node2           Ready    <none>                 6h26m   v1.22.4
+
+
+```
+
+### connecting from any client machine to k8s master 
+
+<img src="conn.png">
+
+### deploy docker image in k8s 
+
+<img src="dep.png">
+
+### docker image t0 POd story 
+
+<img src="pod.png">
+
 
 
 
