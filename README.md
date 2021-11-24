@@ -169,6 +169,121 @@ mysql> ^DBye
 
 ```
 
+### Docker COmpose 
+
+<img src="compose.png">
+
+### COmpsoe file 
+
+<img src="file1.png">
+
+### installing compose client 
+
+```
+ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s
+)-$(uname -m)" -o /usr/local/bin/docker-compose
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   633  100   633    0     0  37235      0 --:--:-- --:--:-- --:--:-- 39562
+100 12.1M  100 12.1M    0     0  79.3M      0 --:--:-- --:--:-- --:--:-- 97.1M
+[ec2-user@ip-172-31-80-220 ~]$ sudo chmod +x /usr/local/bin/docker-compose
+[ec2-user@ip-172-31-80-220 ~]$ sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compos
+[ec2-user@ip-172-31-80-220 ~]$ 
+[ec2-user@ip-172-31-80-220 ~]$ 
+[ec2-user@ip-172-31-80-220 ~]$ docker-compos -v
+docker-compose version 1.29.2, build 5becea4c
+[ec2-user@ip-172-31-80-220 ~]$ 
+
+```
+
+### COmpsoe file 1 
+
+```
+version: '3.8' 
+services:
+ ashuapp1: # first container based app info 
+  image: alpine
+  container_name: ashuc123
+  command: ping fb.com 
+  
+ ashuapp2: # second container based app info 
+  image: nginx 
+  container_name: ashucc222
+  ports:
+   - 3399:80 
+  volumes:
+   - "/mnt:/new"
+
+```
+
+### run file 
+
+```
+
+docker-compose up -d
+Creating network "ashutoshhcompose_default" with the default driver
+Creating ashuc123  ... done
+Creating ashucc222 ... done
+
+
+[ashu@ip-172-31-80-220 ashutoshhcompose]$ docker-compose ps 
+  Name                 Command               State                  Ports                
+-----------------------------------------------------------------------------------------
+ashuc123    ping fb.com                      Up                                          
+ashucc222   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:3399->80/tcp,:::3399->80/tcp
+[ashu@ip-172-31-80-220 ashutoshhcompose]$ 
+
+
+
+
+docker-compose  stop 
+Stopping ashucc222 ... done
+Stopping ashuc123  ... 
+
+
+
+ docker-compose  start ashuapp1
+Starting ashuapp1 ... done
+[ashu@ip-172-31-80-220 ashutoshhcompose]$ docker-compose ps 
+  Name                 Command               State    Ports
+-----------------------------------------------------------
+ashuc123    ping fb.com                      Up            
+ashucc222   /docker-entrypoint.sh ngin ...   Exit 0 
+
+
+```
+
+###  differenent file name 
+
+```
+docker-compose -f   oralce.yaml  up  -d 
+Creating network "ashutoshhcompose_default" with the default driver
+Creating ashuc123  ... done
+Creating ashucc222 ... done
+[ashu@ip-172-31-80-220 ashutoshhcompose]$ docker-compose -f   oralce.yaml  down 
+Stopping ashucc222 ... done
+Stopping ashuc123  ... 
+
+```
+
+###
+
+```
+ docker-compos -f  ashutoshhcompose/oralce.yaml  up -d
+Creating network "ashutoshhcompose_default" with the default driver
+Creating ashuc123  ... done
+Creating ashucc222 ... done
+[ashu@ip-172-31-80-220 appimages]$ docker-compos -f  ashutoshhcompose/oralce.yaml   down 
+Stopping ashucc222 ... done
+Stopping ashuc123  ... 
+
+
+```
+
+
+
+
+
 
 
 
