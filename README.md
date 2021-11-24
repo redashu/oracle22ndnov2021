@@ -369,8 +369,102 @@ node2           Ready    <none>                 6h26m   v1.22.4
 
 <img src="pod.png">
 
+### First POd yaml 
+
+```
+apiVersion: v1 
+kind: Pod 
+metadata: # to define pod details 
+ name: ashupod-1 
+spec: # app info 
+ containers: # info about container 
+ - image: alpine 
+   name: ashuc1
+   command: ["sh","-c","ping google.com"]
+   
+```
+
+### deploy pod in k8s 
+
+```
+ cd  k8sapps/
+[ashu@ip-172-31-80-220 k8sapps]$ ls
+ashupod1.yaml
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl   apply  -f  ashupod1.yaml  
+pod/ashupod-1 created
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl   get  pods 
+NAME        READY   STATUS    RESTARTS   AGE
+ashupod-1   1/1     Running   0          9s
+
+```
+
+### more pod details
+
+```
+kubectl  get  pods  ashupod-1  -o wide
+NAME        READY   STATUS    RESTARTS   AGE     IP              NODE    NOMINATED NODE   READINESS GATES
+ashupod-1   1/1     Running   0          4m39s   192.168.104.7   node2   <none>           <none>
+
+```
+
+### deleting pods 
+
+```
+kubectl  delete pod  ashupod-1 
+pod "ashupod-1" deleted
+
+```
+
+### 
+
+```
+kubectl  delete pod  --all     
+pod "arifpod-1" deleted
+pod "ashpod1" deleted
+pod "nikhpod-1" deleted
+pod "royod-1" deleted
+pod "sarapod-2" deleted
+pod "sravanlocalpod-1" deleted
+pod "sravanpod-1" deleted
+
+```
+
+### checking output of container inside POD 
+
+```
+kubectl  logs -f  ashupod-1 
+PING google.com (142.250.65.78): 56 data bytes
+64 bytes from 142.250.65.78: seq=0 ttl=51 time=1.007 ms
+64 bytes from 142.250.65.78: seq=1 ttl=51 time=1.060 ms
+64 bytes from 142.250.65.78: seq=2 ttl=51 time=1.076 ms
+64 bytes from 142.250.65.78: seq=3 ttl=51 time=1.072 ms
+64 bytes from 142.250.65.78: seq=4 ttl=51 time=1.048 ms
+64 bytes from 142.250.65.78: seq=5 ttl=51 time=1.068 ms
+64 bytes from 142.250.65.78: seq=6 ttl=51 time=1.112 ms
+64 bytes from 142.250.65.78: seq=7 ttl=51 time=1.090 ms
+
+```
+
+### accessing  container of pod 
+
+```
+kubectl  exec -it  ashupod-1  -- sh 
+
+/ # 
+/ # cat  /etc/os-release 
+NAME="Alpine Linux"
+ID=alpine
+VERSION_ID=3.14.3
+PRETTY_NAME="Alpine Linux v3.14"
+HOME_URL="https://alpinelinux.org/"
+BUG_REPORT_URL="https://bugs.alpinelinux.org/"
+/ # ls
+bin    etc    lib    mnt    proc   run    srv    tmp    var
+dev    home   media  opt    root   sbin   sys    usr
+/ # exit
 
 
+```
 
 
 
