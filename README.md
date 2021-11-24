@@ -127,6 +127,48 @@ NetworkManager           groff                    m
 
 ```
 
+### remove volumes 
+
+```
+ docker volume  prune 
+WARNING! This will remove all local volumes not used by at least one container.
+Are you sure you want to continue? [y/N] y
+Deleted Volumes:
+krishnavol1
+varunvol1
+royvol
+vamshivol1
+shared
+Saravana2505
+ashuvol1
+
+```
+
+### mysql DB instance launch 
+
+```
+docker  run -itd  --name  ashudb11  -v  /tmp/ashudb:/var/lib/mysql/      -e  MYSQL_ROOT_PASSWORD=Orpass077  mysql:5.7 
+
+ docker  exec -it  ashudb11  bash 
+root@2330c5611c60:/# 
+root@2330c5611c60:/# mysql -u root -p 
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 3
+Server version: 5.7.36 MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> ^DBye
+
+```
+
 
 
 
