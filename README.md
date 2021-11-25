@@ -208,6 +208,40 @@ CURRENT   NAME                          CLUSTER      AUTHINFO           NAMESPAC
 
 ```
 
+### deploy pod in different namespace 
+
+```
+kubectl apply -f  ashupod1.yaml   -n  default 
+pod/ashupod-1 created
+
+```
+
+### YAML with custom changes 
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: default # namespace information 
+  creationTimestamp: null
+  labels:
+    run: ashupod3
+  name: ashupod3 # name of pod 
+spec:
+  nodeName: node1 # static scheduling 
+  containers:
+  - image: nginx # docker image 
+    name: ashupod3 # name of container 
+    ports: # container app port number 
+    - containerPort: 80
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+
+```
+
 
 
 
