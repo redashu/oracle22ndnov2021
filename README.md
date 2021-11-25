@@ -322,7 +322,118 @@ ashuweb   1/1     Running   0          41s   192.168.166.136   node1   <none>   
 
 <img src="demo1.png">
 
+### we need Internal LB for apps having multiple POds 
+
+<img src="podss.png">
+
+### SErvice Intro 
+
+<img src="svc.png">
+
+### k8s Internal LB -- usage --of POD to connect
+
+<img src="lb1.png">
+
+### checking label of running pod 
+
+```
+kubectl  get  po
+NAME      READY   STATUS    RESTARTS   AGE
+ashuweb   1/1     Running   0          124m
+ fire@ashutoshhs-MacBook-Air  ~  kubectl  get  po --show-labels
+NAME      READY   STATUS    RESTARTS   AGE    LABELS
+ashuweb   1/1     Running   0          124m   x1=helloashu
+
+```
+
+### service type in k8s 
+
+<img src="stype.png">
+
+### nodeport type service 
+
+<img src="np.png">
+
+### creating nodeport service type yaml 
+
+```
+kubectl   create  service 
+Create a service using a specified subcommand.
+
+Aliases:
+service, svc
+
+Available Commands:
+  clusterip    Create a ClusterIP service
+  externalname Create an ExternalName service
+  loadbalancer Create a LoadBalancer service
+  nodeport     Create a NodePort service
+
+Usage:
+  kubectl create service [flags] [options]
+
+Use "kubectl <command> --help" for more information about a given command.
+Use "kubectl options" for a list of global command-line options (applies to all commands).
+[ashu@ip-172-31-80-220 appimages]$ kubectl   create  service  nodeport  ashusvc1  --tcp  1234:80  --dry-run=client  -o yaml  >ashusvc.yaml 
+```
 
 
+### service nodeport after selector modification 
 
+```
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashusvc1
+  name: ashusvc1 # name of service 
+spec:
+  ports:
+  - name: 1234-80
+    port: 1234 # service IP port number 
+    protocol: TCP
+    targetPort: 80 # app port which is running in a pod 
+  selector: # POd finder using label of pod 
+    x1: helloashu # this is label of POD 
+  type: NodePort # type of service 
+status:
+  loadBalancer: {}
+
+
+```
+
+### deploy service 
+
+```
+ kubectl  apply -f  ashusvc.yaml 
+service/ashusvc1 created
+[ashu@ip-172-31-80-220 appimages]$ kubectl   get  svc
+NAME       TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+ashusvc1   NodePort   10.97.31.169   <none>        1234:30633/TCP   6s
+
+```
+
+### nodeport svc verification 
+
+<img src="npv.png">
+
+### chekcing lable and selector 
+
+```
+kubectl  get  po --show-labels 
+NAME      READY   STATUS    RESTARTS   AGE    LABELS
+ashuweb   1/1     Running   0          155m   x1=helloashu
+ fire@ashutoshhs-MacBook-Air  ~  
+ fire@ashutoshhs-MacBook-Air  ~  
+ fire@ashutoshhs-MacBook-Air  ~  
+ fire@ashutoshhs-MacBook-Air  ~  kubectl  get  svc
+NAME       TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+ashusvc1   NodePort   10.97.31.169   <none>        1234:30633/TCP   7m22s
+ fire@ashutoshhs-MacBook-Air  ~  kubectl  get  svc -o wide
+NAME       TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE     SELECTOR
+ashusvc1   NodePort   10.97.31.169   <none>        1234:30633/TCP   7m29s   x1=helloashu
+
+
+```
 
