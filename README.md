@@ -242,6 +242,87 @@ status: {}
 
 ```
 
+### COntainer Networking model 
+
+<img src="cn.png">
+
+### CNI plugins 
+
+<img src="cni.png">
+
+## CNI bridge 
+
+<img src="br.png">
+
+### checking pod IP 
+
+```
+kubectl  get  po  -o wide       
+NAME        READY   STATUS    RESTARTS   AGE   IP               NODE    NOMINATED NODE   READINESS GATES
+ashupod-1   1/1     Running   0          74m   192.168.104.54   node2   <none>           <none>
+ fire@ashutoshhs-MacBook-Air  ~  kubectl describe  po   ashupod-1
+Name:         ashupod-1
+Namespace:    ashu-space
+Priority:     0
+Node:         node2/172.31.93.71
+Start Time:   Thu, 25 Nov 2021 11:11:59 +0530
+Labels:       <none>
+Annotations:  cni.projectcalico.org/containerID: 4023c10f42dc900d3d739d9f679ba5456bef7ffc0c25fd757980298f1d2938e3
+              cni.projectcalico.org/podIP: 192.168.104.54/32
+              cni.projectcalico.org/podIPs: 192.168.104.54/32
+Status:       Running
+IP:           192.168.104.54
+
+
+```
+
+### POD from different namespace can connect by default 
+
+
+```
+ kubectl  exec -it   ashutoshhpod1 -n tasks  -- sh 
+/ # 
+/ # ping  192.168.104.54
+PING 192.168.104.54 (192.168.104.54): 56 data bytes
+64 bytes from 192.168.104.54: seq=0 ttl=254 time=0.124 ms
+64 bytes from 192.168.104.54: seq=1 ttl=254 time=0.127 ms
+64 bytes from 192.168.104.54: seq=2 ttl=254 time=0.123 ms
+^C
+--- 192.168.104.54 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.123/0.124/0.127 ms
+/ # exit
+
+```
+
+### webapp in POD 
+
+```
+ kubectl   run  ashuweb  --image=dockerashu/orwebapp:v007  --port 80  --dry-run=client -o yaml  >orwebapp.yaml
+ 
+ kubectl  apply -f  orwebapp.yaml 
+ 
+ kubectl   get  po 
+NAME      READY   STATUS    RESTARTS   AGE
+ashuweb   1/1     Running   0          37s
+[ashu@ip-172-31-80-220 webapp1]$ kubectl   get  po  -o wide
+NAME      READY   STATUS    RESTARTS   AGE   IP                NODE    NOMINATED NODE   READINESS GATES
+ashuweb   1/1     Running   0          41s   192.168.166.136   node1   <none>           <none>
+
+```
+
+### case 1. k8s clients 
+
+```
+ kubectl  port-forward  ashuweb  1122:80 
+ 
+```
+
+### Demo 
+
+<img src="demo1.png">
+
+
 
 
 
