@@ -437,3 +437,85 @@ ashusvc1   NodePort   10.97.31.169   <none>        1234:30633/TCP   7m29s   x1=h
 
 ```
 
+### getting all data in your namespace 
+
+
+```
+ kubectl   get   po,svc
+NAME          READY   STATUS    RESTARTS   AGE
+pod/ashuweb   1/1     Running   0          165m
+
+NAME               TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+service/ashusvc1   NodePort   10.97.31.169   <none>        1234:30633/TCP   17m
+[ashu@ip-172-31-80-220 appimages]$ 
+[ashu@ip-172-31-80-220 appimages]$ kubectl   get  all
+NAME          READY   STATUS    RESTARTS   AGE
+pod/ashuweb   1/1     Running   0          165m
+
+NAME               TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+service/ashusvc1   NodePort   10.97.31.169   <none>        1234:30633/TCP   18m
+
+```
+### Merging pod and svc YAML in a same file 
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels: # label of POD can be changed in run time and after that also
+    x1: helloashu # key and value pair 
+  name: ashuweb # name of pod 
+spec:
+  containers:
+  - image: dockerashu/orwebapp:v007 # docker hub image 
+    name: ashuweb # name of POD 
+    ports: # app port 
+    - containerPort: 80
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashusvc1
+  name: ashusvc1 # name of service 
+spec:
+  ports:
+  - name: 1234-80
+    port: 1234 # service IP port number 
+    protocol: TCP
+    targetPort: 80 # app port which is running in a pod 
+  selector: # POd finder using label of pod 
+    x1: helloashu # this is label of POD 
+  type: NodePort # type of service 
+status:
+  loadBalancer: {}
+
+
+```
+
+
+### Deploy 
+
+```
+ kubectl  apply -f  finalapp.yaml 
+pod/ashuweb created
+service/ashusvc1 created
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get po --show-labels 
+NAME      READY   STATUS    RESTARTS   AGE   LABELS
+ashuweb   1/1     Running   0          9s    x1=helloashu
+[ashu@ip-172-31-80-220 k8sapps]$ 
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get svc  -o wide
+NAME       TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE   SELECTOR
+ashusvc1   NodePort   10.110.25.156   <none>        1234:32173/TCP   16s   x1=helloashu
+[ashu@ip-172-31-80-220 k8sapps]$ 
+
+```
+
