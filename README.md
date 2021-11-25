@@ -518,4 +518,76 @@ ashusvc1   NodePort   10.110.25.156   <none>        1234:32173/TCP   16s   x1=he
 [ashu@ip-172-31-80-220 k8sapps]$ 
 
 ```
+### task 2 solution 
+
+#### YAML 
+
+```
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: ashuk8s1
+spec: {}
+status: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ashupod
+  name: ashupod
+  namespace: ashuk8s1
+spec:
+  containers:
+  - image: ubuntu
+    name: ashupod
+    command: ["bash","-c","sleep 10000"]
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashusvc1
+  name: ashusvc1
+  namespace: ashuk8s1
+spec:
+  ports:
+  - name: 1233-80
+    port: 1233
+    protocol: TCP
+    targetPort: 80
+    nodePort: 31002 # settting static port number 
+  selector:
+    app: ashusvc1
+  type: NodePort
+status:
+  loadBalancer: {}
+
+```
+
+### commands 
+
+```
+603  kubectl   create   namespace  ashuk8s1 --dry-run=client -o yaml 
+  604  kubectl   create   namespace  ashuk8s1 --dry-run=client -o yaml  >task2.yaml 
+  605  kubectl   run  ashupod  --image=ubuntu --namespace=ashuk8s1  --dry-run=client  -o yaml 
+  606  kubectl  apply -f  task2.yaml 
+  607  kubectl   get po -n ashuk8s 
+  608  kubectl   get po -n ashuk8s1 
+  609  kubectl   create  service  nodeport ashusvc1 --tcp 1233:80  --namespace=ashuk8s1  --dry-run=client -o yaml 
+  610  ls
+  611  kubectl apply -f  task2.yaml 
+  612  kubectl  get  svc -n ashuk8s1 
+  613  kubectl  get  all -n ashuk8s1 
+  614  ls
+  615  kubectl  cp  logs.txt   ashupod:/tmp/ -n ashuk8s1 
+
+```
 
