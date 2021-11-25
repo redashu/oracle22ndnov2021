@@ -591,3 +591,70 @@ status:
 
 ```
 
+### REPlication controller 
+
+```
+apiVersion: v1
+kind: ReplicationController
+metadata:
+ name: ashurc-1 
+spec:
+ replicas: 1 # number of POD to be created 
+ template: # put pod template 
+  metadata:
+   labels: # label of pod 
+    x1: helloashuapp
+  spec:
+   containers:
+   - image: dockerashu/orwebapp:v007
+     name: ashuc1
+     ports:
+     - containerPort: 80 
+     
+```
+
+###  Deploy 
+
+```
+kubectl apply -f  ashurc1.yaml 
+replicationcontroller/ashurc-1 created
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get  rc
+NAME       DESIRED   CURRENT   READY   AGE
+ashurc-1   1         1         1       4s
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get  pod
+NAME             READY   STATUS    RESTARTS   AGE
+ashurc-1-w8f4m   1/1     Running   0          10s
+
+```
+
+### self healing 
+
+```
+ kubectl  delete pod ashurc-1-w8f4m
+pod "ashurc-1-w8f4m" deleted
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get  pod
+NAME             READY   STATUS    RESTARTS   AGE
+ashurc-1-js5x7   1/1     Running   0          4s
+
+
+```
+
+### creating service using expose 
+
+```
+
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get   rc
+NAME       DESIRED   CURRENT   READY   AGE
+ashurc-1   1         1         1       4m18s
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get   po --show-labels
+NAME             READY   STATUS    RESTARTS   AGE     LABELS
+ashurc-1-js5x7   1/1     Running   0          3m35s   x1=helloashuapp
+[ashu@ip-172-31-80-220 k8sapps]$ 
+[ashu@ip-172-31-80-220 k8sapps]$ 
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  expose  rc  ashurc-1  --type NodePort --port 80 --name ashusvc2
+service/ashusvc2 exposed
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl   get  svc -o wide 
+NAME       TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+ashusvc2   NodePort   10.101.96.250   <none>        80:30154/TCP   13s   x1=helloashuapp
+```
+
