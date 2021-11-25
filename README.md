@@ -79,4 +79,28 @@ namespace:  20 bytes
 token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IlBiZUJmQkdmQUI4bHFpelpZZkxzTG9UaEZyNjJPX1AzbWNrTVpKSmlOcTQifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZ
 ```
 
+### generate yaml / JSON output 
+
+```
+ 7087  kubectl  run  ashupodx1  --image=nginx   --port 80 --dry-run=client -o yaml
+ 7088  kubectl  run  ashupodx1  --image=nginx   --port 80 --dry-run=client -o json 
+```
+
+### yaml file saved 
+
+```
+kubectl   run  ashupod3  --image=nginx --port 80 --dry-run=client -o yaml   >nginx.yaml
+
+```
+
+### replacing 
+
+```
+ kubectl  replace -f nginx.yaml  --force 
+pod "ashupod3" deleted
+pod/ashupod3 replaced
+
+```
+
+
 
