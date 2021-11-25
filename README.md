@@ -658,3 +658,40 @@ NAME       TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE   SELECTO
 ashusvc2   NodePort   10.101.96.250   <none>        80:30154/TCP   13s   x1=helloashuapp
 ```
 
+### scaling POD via RC 
+
+```
+kubectl scale  rc  ashurc-1  --replicas=3
+replicationcontroller/ashurc-1 scaled
+[ashu@ip-172-31-80-220 k8sapps]$ 
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl    get  po 
+NAME             READY   STATUS    RESTARTS   AGE
+ashurc-1-js5x7   1/1     Running   0          16m
+ashurc-1-nf2j8   1/1     Running   0          4s
+ashurc-1-x2wpw   1/1     Running   0          4s
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl    get  po  -o wide
+NAME             READY   STATUS    RESTARTS   AGE   IP                NODE    NOMINATED NODE   READINESS GATES
+ashurc-1-js5x7   1/1     Running   0          16m   192.168.166.186   node1   <none>           <none>
+ashurc-1-nf2j8   1/1     Running   0          17s   192.168.104.1     node2   <none>           <none>
+ashurc-1-x2wpw   1/1     Running   0          17s   192.168.104.62    node2   <none>           <none>
+
+```
+
+### Deploy app in k8s from private Registry 
+
+<img src="reg.png">
+
+### Pushing image to OCR 
+
+```
+ 644  docker  tag  247bf4bc2225   phx.ocir.io/axmbtg8judkl/mywebapp:v1 
+  645  docker  images
+  646  docker  login  phx.ocir.io 
+  647  docker  login  phx.ocir.io  
+  648  docker  push phx.ocir.io/axmbtg8judkl/mywebapp:v1
+  649  history 
+  650  docker  logout   phx.ocir.io  
+  
+```
+
+
