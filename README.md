@@ -441,5 +441,253 @@ metadata:
   name: ashudbsec
   
 ```
- 
- 
+ ### after deployment of DB yaml 
+
+### creating service of clusterIP type 
+
+```
+kubectl  expose deployment  ashudb --type ClusterIP --port 3306 --dry-run=client -o yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudb
+  name: ashudb
+
+
+```
+
+### serivce deploy 
+
+```
+$ kubectl  get  deploy 
+NAME     READY   UP-TO-DATE   AVAILABLE   AGE
+ashudb   1/1     1            1           16m
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get  po
+NAME                      READY   STATUS    RESTARTS   AGE
+ashudb-6c75f6bfdf-k7qh8   1/1     Running   0          16m
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get  svc
+NAME     TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+ashudb   ClusterIP   10.108.122.238   <none>        3306/TCP   19s
+[ashu@ip-172-31-80-220 k8sapps]$ 
+
+```
+
+### webapp YAML content 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashuwebapp
+  name: ashuwebapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashuwebapp
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashuwebapp
+    spec:
+      containers:
+      - image: wordpress:4.8-apache
+        name: wordpress
+        resources: {}
+status: {}
+
+
+```
+
+### deploy 
+
+```
+kubectl apply -f  multitierapp.yaml 
+deployment.apps/ashudb configured
+secret/ashudbsec configured
+service/ashudb configured
+deployment.apps/ashuwebapp created
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl   get  deploy 
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+ashudb       1/1     1            1           52m
+ashuwebapp   1/1     1            1           15s
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl   get  po 
+NAME                          READY   STATUS    RESTARTS   AGE
+ashudb-6c75f6bfdf-k7qh8       1/1     Running   0          52m
+ashuwebapp-7f5bf75f88-86cdf   1/1     Running   0          23s
+
+```
+### creating nodeport or LB service for WEbapp
+
+```
+kubectl  expose deployment  ashuwebapp  --type NodePort --port 80 --dry-run=client -o yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashuwebapp
+  name: ashuwebapp
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ashuwebapp
+  type: NodePort
+status:
+  loadBalancer: {}
+
+
+```
+
+### deploy again 
+
+```
+kubectl apply -f  multitierapp.yaml 
+deployment.apps/ashudb configured
+secret/ashudbsec configured
+service/ashudb configured
+deployment.apps/ashuwebapp configured
+service/ashuwebapp created
+
+```
+
+### FInal app yaml 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudb
+  name: ashudb # name of deployment 
+spec:
+  replicas: 1 # number of DB pods 
+  selector:
+    matchLabels:
+      app: ashudb
+  strategy: {}
+  template: # template to create DB POD 
+    metadata:
+      creationTimestamp: null
+      labels: # label of pod 
+        app: ashudb
+    spec:
+      volumes: # to create volume 
+      - name: ashudbvol
+        hostPath: # taking storage from Minion Node 
+         path: /ashudata
+         type: DirectoryOrCreate 
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        env: # set / create ENV variable in POD 
+        - name: MYSQL_ROOT_PASSWORD 
+          valueFrom: # calling value 
+           secretKeyRef: # from secret 
+            name: ashudbsec # name of secret 
+            key: sqlpass  # key of secret 
+        volumeMounts: # to mount storage we created above 
+        - name: ashudbvol
+          mountPath: /var/lib/mysql/ 
+        resources: {}
+status: {}
+# creating secret 
+---
+apiVersion: v1
+data:
+  sqlpass: T3JhY2xldHIwOTk=
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: ashudbsec
+
+# creating clusterIP type service to anything which is not exposable to outside
+# world 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudb
+  name: ashudb
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: ashudb
+  type: ClusterIP
+status:
+  loadBalancer: {}
+# webapp 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashuwebapp
+  name: ashuwebapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashuwebapp
+  strategy: {}
+  template: # template of POD 
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashuwebapp
+    spec:
+      containers:
+      - image: wordpress:4.8-apache
+        name: wordpress
+        env: # using env to connect DB 
+        - name: WORDPRESS_DB_HOST
+          value: ashudb # service name of DB deployment 
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom: # reading DB password from Secret 
+           secretKeyRef:
+            name: ashudbsec # name of secret 
+            key: sqlpass # key of secret 
+        resources: {}
+status: {}
+# creating service for deploy webapp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashuwebapp
+  name: ashuwebapp
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ashuwebapp
+  type: NodePort
+status:
+  loadBalancer: {}
+
+
+
+
+```
+
+
