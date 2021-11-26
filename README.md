@@ -231,3 +231,73 @@ ashurc-1-dxvfp   1/1     Running   0          24s
 
 ```
 
+### deployment api resource type 
+
+<img src="dep.png">
+
+### creating deployment 
+
+```
+kubectl  create  deployment  ashuapp --image=dockerashu/orwebapp:v007   --dry-run=client -o yaml  >deployment.yaml
+
+```
+
+#### 
+
+```
+$ kubectl   get  deployments 
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+ashuapp   1/1     1            1           2m36s
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl   get  deploy
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+ashuapp   1/1     1            1           2m41s
+[ashu@ip-172-31-80-220 k8sapps]$ 
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get  pods
+NAME                       READY   STATUS    RESTARTS   AGE
+ashuapp-748b47f987-hz444   1/1     Running   0          2m45s
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  expose deployment  ashuapp  --type NodePort --port 80 --name  hellosvc1 
+service/hellosvc1 exposed
+
+
+```
+
+### manual scaling 
+
+```
+kubectl  scale deploy  ashuapp  --replicas=3
+deployment.apps/ashuapp scaled
+[ashu@ip-172-31-80-220 k8sapps]$ 
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get  deploy
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+ashuapp   3/3     3            3           6m43s
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl  get  po
+NAME                       READY   STATUS    RESTARTS   AGE
+ashuapp-748b47f987-hz444   1/1     Running   0          6m47s
+ashuapp-748b47f987-s2z8d   1/1     Running   0          7s
+ashuapp-748b47f987-vbmp8   1/1     Running   0          7s
+
+```
+
+### DNS + LB 
+
+<img src="lbb.png">
+
+### end user to pod access 
+
+<img src="e2p.png">
+
+### Loadbalancer service 
+
+<img src="lbsvc.png">
+
+```
+ kubectl  expose deploy  ashuapp  --type LoadBalancer --port 80 --name lbsvc  
+service/lbsvc exposed
+[ashu@ip-172-31-80-220 k8sapps]$ kubectl   get  svc 
+NAME        TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+hellosvc1   NodePort       10.100.213.193   <none>        80:31361/TCP   37m
+lbsvc       LoadBalancer   10.107.112.58    <pending>     80:30568/TCP   4s
+
+```
+
+
