@@ -366,4 +366,80 @@ ashuapp-dbb48df49-z8xv9   1/1     Running   0          2m24s
 
 ```
 
+### two tier app 
 
+### tier 1 is DB with Storage 
+
+### creating DB yaml 
+
+
+```
+kubectl   create  deployment  ashudb --image=mysql:5.6 --dry-run=client -o yaml 
+
+====
+
+kubectl  create secret  generic  ashudbsec  --from-literal  slqpass=Oracletr099 --dry-run=client -o yaml 
+apiVersion: v1
+data:
+  slqpass: T3JhY2xldHIwOTk=
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: ashudbsec
+
+```
+
+### DB YAML 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudb
+  name: ashudb # name of deployment 
+spec:
+  replicas: 1 # number of DB pods 
+  selector:
+    matchLabels:
+      app: ashudb
+  strategy: {}
+  template: # template to create DB POD 
+    metadata:
+      creationTimestamp: null
+      labels: # label of pod 
+        app: ashudb
+    spec:
+      volumes: # to create volume 
+      - name: ashudbvol
+        hostPath: # taking storage from Minion Node 
+         path: /ashudata
+         type: DirectoryOrCreate 
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        env: # set / create ENV variable in POD 
+        - name: MYSQL_ROOT_PASSWORD 
+          valueFrom: # calling value 
+           secretKeyRef: # from secret 
+            name: ashudbsec # name of secret 
+            key: sqlpass  # key of secret 
+        volumeMounts: # to mount storage we created above 
+        - name: ashudbvol
+          mountPath: /var/lib/mysql/ 
+        resources: {}
+status: {}
+# creating secret 
+---
+apiVersion: v1
+data:
+  sqlpass: T3JhY2xldHIwOTk=
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: ashudbsec
+  
+```
+ 
+ 
