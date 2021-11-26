@@ -300,4 +300,70 @@ lbsvc       LoadBalancer   10.107.112.58    <pending>     80:30568/TCP   4s
 
 ```
 
+### scaling in POD 
+
+<img src="scalepod.png">
+
+### HPA {Horizental pod auto scaler }
+
+<img src="hpa.png">
+
+### putting resource limit in POD 
+
+<img src="lmpod.png">
+
+### Deployment YAML 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashuapp
+  name: ashuapp # name of deployment 
+spec: 
+  replicas: 1 # no of pod 
+  selector:
+    matchLabels:
+      app: ashuapp
+  strategy: {}
+  template: # to create pod we need template 
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashuapp
+    spec:
+      containers:
+      - image: dockerashu/orwebapp:v007
+        name: orwebapp
+        resources: # to put resource limit in POD 
+         requests: # 1 vcpu == 1000 m 
+          cpu: 200m
+         limits: # max cpu used by POD 
+          cpu: 500m 
+status: {}
+
+```
+
+### autoscale rule 
+
+```
+kubectl  autoscale  deployment  ashuapp --min=3  --max=20 --cpu-percent=80
+horizontalpodautoscaler.autoscaling/ashuapp autoscaled
+ fire@ashutoshhs-MacBook-Air  ~  
+ fire@ashutoshhs-MacBook-Air  ~  kubectl  get  hpa
+NAME      REFERENCE            TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+ashuapp   Deployment/ashuapp   <unknown>/80%   3         20        0          5s
+ fire@ashutoshhs-MacBook-Air  ~  kubectl  get  deploy 
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+ashuapp   1/3     3            1           8m6s
+ fire@ashutoshhs-MacBook-Air  ~  kubectl  get  po 
+NAME                      READY   STATUS    RESTARTS   AGE
+ashuapp-dbb48df49-8nwnv   1/1     Running   0          8s
+ashuapp-dbb48df49-8zkjb   1/1     Running   0          8s
+ashuapp-dbb48df49-z8xv9   1/1     Running   0          2m24s
+
+```
+
 
